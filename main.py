@@ -3,24 +3,24 @@ from recipe_logic import get_recipe
 
 st.title("Keep And Cook")
 
-# 1. 완벽하게 초기화 (기존 잘못된 데이터 제거)
-if "items" not in st.session_state or not isinstance(st.session_state.items, list):
+# 세션 상태 초기화
+if "items" not in st.session_state:
     st.session_state.items = []
 
-# --- 샘플 데이터 추가 로직 ---
+# --- 임시 데이터 추가 로직 (테스트용) ---
 if st.button("샘플 데이터 추가"):
-    # 여기서 확실하게 리스트 형식으로 저장
     st.session_state.items = [
         {"name": "우유", "dDay": 1},
         {"name": "계란", "dDay": 3},
         {"name": "양파", "dDay": 7}
     ]
-    st.rerun() # 데이터를 업데이트하고 즉시 새로고침
+    st.success("샘플 데이터가 추가되었습니다!")
 
 # 요리 추천 버튼
 if st.button("유통기한 임박 재료로 레시피 추천받기"):
-    # 2. 데이터 타입 명시적 체크
-    if isinstance(st.session_state.items, list) and len(st.session_state.items) > 0:
+    if not st.session_state.items:
+        st.error("먼저 영수증을 업로드하거나 재료를 추가해주세요!")
+    else:
         with st.spinner("레시피를 생성하는 중..."):
             recipe, link = get_recipe(st.session_state.items)
             
@@ -30,10 +30,7 @@ if st.button("유통기한 임박 재료로 레시피 추천받기"):
                 st.link_button("레시피 상세 확인하기", link)
             else:
                 st.error(recipe)
-    else:
-        st.error("데이터가 리스트 형식이 아니거나 비어있습니다. 샘플을 추가해주세요.")
 
-# 디버깅: 타입 확인
+# 현재 목록 확인용 (디버깅)
 st.write("---")
-st.write(f"현재 데이터 타입: {type(st.session_state.items)}")
-st.write("현재 내용:", st.session_state.items)
+st.write("현재 냉장고 재료 목록:", st.session_state.items)
